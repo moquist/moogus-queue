@@ -2,7 +2,7 @@
   (:require
    [immutant.web]
    ;;[ring.adapter.jetty]
-   [moogus-queue.web :as web])
+   [moogus-queue.web])
   (:import (java.io File)))
 
 (def system nil)
@@ -18,9 +18,9 @@
 
 (defn start-system! [_]
   (let [system (load-system-config)]
-    ;;(ring.adapter.jetty/run-jetty web/app {:port 9000 :join? false})
-    (assoc system :immutant-web (immutant.web/start (web/app system)))
-    ))
+    ;;(ring.adapter.jetty/run-jetty moogus-queue.web/app {:port 9000 :join? false})
+    (immutant.web/start moogus-queue.web/app)
+    (assoc system :immutant-web true)))
 
 (defn stop-system! [_])
 
