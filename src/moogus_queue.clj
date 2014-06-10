@@ -1,10 +1,12 @@
 (ns moogus-queue
   (:require
    [immutant.web]
+   [immutant.messaging]
    ;;[ring.adapter.jetty]
    [moogus-queue.web])
   (:import (java.io File)))
 
+(def queue-name "queue.moogus")
 (def system nil)
 
 (defn file-exists? [path]
@@ -16,11 +18,21 @@
       (clojure.edn/read-string (slurp path))
       (throw (Exception. (str "Config file missing: " path))))))
 
+(defn worker [system message] (spit "/tmp/blarpfiggle.edn" message :append true))
+
+(defn start-queue! [system]
+  (immutant.messaging/start queue-name)
+  (immutant.messaging/listen queue-name (partial worker system)))
+
 (defn start-system! [_]
-  (let [system (load-system-config)]
+  (let [system (load-system-config)
+        system (assoc system :queue-name queue-name)]
     ;;(ring.adapter.jetty/run-jetty moogus-queue.web/app {:port 9000 :join? false})
-    (immutant.web/start moogus-queue.web/app)
-    (assoc system :immutant-web true)))
+    (start-queue! system)
+    (immutant.web/start (moogus-queue.web/app system))
+    (assoc system
+      :immutant-queue true
+      :immutant-web true)))
 
 (defn stop-system! [_])
 
