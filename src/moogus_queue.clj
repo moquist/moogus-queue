@@ -2,7 +2,7 @@
   (:require
    [immutant.web]
    [immutant.messaging]
-   ;;[ring.adapter.jetty]
+   [clj-http.client]
    [moogus-queue.web])
   (:import (java.io File)))
 
