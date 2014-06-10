@@ -18,7 +18,17 @@
       (clojure.edn/read-string (slurp path))
       (throw (Exception. (str "Config file missing: " path))))))
 
-(defn worker [system message] (spit "/tmp/blarpfiggle.edn" message :append true))
+(defn call! [uri f params]
+  (let [url (str uri "/" f)]
+    (clj-http.client/post url {:form-params params})
+    #_
+    (spit "/tmp/blarpfiddle.edn" [uri params] :append true)))
+
+(defn worker [{:keys [genius-api-url genius-api-token-outgoing]} message]
+  (let [f (:function message)
+        params (dissoc message :function)
+        params (assoc message :token genius-api-token-outgoing)]
+    (spit "/tmp/blarpfiddle.edn" (call! genius-api-url f params))))
 
 (defn start-queue! [system]
   (immutant.messaging/start queue-name)
