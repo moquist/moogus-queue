@@ -23,9 +23,7 @@
 
 (defn call! [uri f params]
   (let [url (str uri "/" f)]
-    (clj-http.client/post url {:form-params params})
-    #_
-    (spit "/tmp/blarpfiddle.edn" [uri params] :append true)))
+    (clj-http.client/post url {:form-params params})))
 
 (defn worker [{:keys [genius-api-url genius-api-token-outgoing]} message]
   (let [f (:function message)
