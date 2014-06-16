@@ -39,9 +39,9 @@
   [query & data-sources]
   (map #(d/touch
          (d/entity
-          (d/db (:db-conn moogus-queue/system))
+          (d/db @(:db-conn moogus-queue/system))
           (first %)))
-       (apply d/q query (d/db (:db-conn moogus-queue/system)) data-sources)))
+       (apply d/q query (d/db @(:db-conn moogus-queue/system)) data-sources)))
 
 (defn ptouch-that
   "Example: (ptouch-that '[:find ?e :where [?e :user/username]])"

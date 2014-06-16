@@ -5,13 +5,20 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [routes PUT]]
             [clojure.data.json :as json]
-            [immutant.messaging]))
+            [immutant.messaging]
+            [datomic.api :as d]))
+
+(defn assert-queue-entry [db-conn queue-name message]
+  (d/transact db-conn [{:db/id (d/tempid :db.part/user)
+                        :queue-entry/message (str message)
+                        :queue-entry/attempted-count 0}]))
 
 (defn enqueue [system ctx]
   (let [queue-name (:queue-name system)
         body (slurp (get-in ctx [:request :body]))
         body (json/read-str body :key-fn keyword)]
-    (immutant.messaging/publish queue-name body)))
+    (when (assert-queue-entry @(:db-conn system) queue-name body)
+      (immutant.messaging/publish queue-name body))))
 
 (defresource qresource [system _request]
   :allowed-methods [:put]

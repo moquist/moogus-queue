@@ -3,7 +3,10 @@
    [immutant.web]
    [immutant.messaging]
    [clj-http.client]
-   [moogus-queue.web])
+   [datomic-schematode :as dst]
+   [datomic.api :as d]
+   [moogus-queue.web]
+   [moogus-queue.schema])
   (:import (java.io File)))
 
 (def queue-name "queue.moogus")
