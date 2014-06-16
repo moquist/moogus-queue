@@ -36,16 +36,22 @@
   (immutant.messaging/listen queue-name (partial worker system)))
 
 (defn start-system! [_]
-  (let [system (load-system-config)
-        system (assoc system :queue-name queue-name)]
+  (let [system {:config (load-system-config)}
+        db-url (-> system :config :db-url)
+        system (assoc system :queue-name queue-name)
+        system (assoc system :new-db (d/create-database db-url))
+        system (assoc system :db-conn (delay (d/connect db-url)))]
     ;;(ring.adapter.jetty/run-jetty moogus-queue.web/app {:port 9000 :join? false})
+    (dst/load-schema! @(:db-conn system) moogus-queue.schema/schema)
     (start-queue! system)
     (immutant.web/start (moogus-queue.web/app system))
     (assoc system
       :immutant-queue true
       :immutant-web true)))
 
-(defn stop-system! [_])
+(defn stop-system! [system]
+  (immutant.web/stop)
+  (immutant.messaging/stop queue-name))
 
 (defn init []
   (alter-var-root #'system start-system!))
