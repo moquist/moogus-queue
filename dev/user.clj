@@ -6,6 +6,7 @@
             [clojure.repl :refer :all]
             [clojure.test :as test]
             [datomic.api :as d]
+            [immutant.dev]
             [moogus-queue]))
 
 (defn stop! []
@@ -19,12 +20,14 @@
    It makes you feel better."
   []
   (stop!)
+  (immutant.dev/reload-project!)
   (start!))
 
 (defn reset-and-delete-db! [delete-db]
   (when (= :delete-db delete-db)
     (stop!)
     (d/delete-database (get-in moogus-queue/system [:config :datomic-url]))
+    (immutant.dev/reload-project!)
     (start!)))
 
 (defn touch-that
