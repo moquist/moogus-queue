@@ -6,6 +6,7 @@
             [clojure.repl :refer :all]
             [clojure.test :as test]
             [datomic.api :as d]
+            [datomic-schematode :as dst]
             [immutant.dev]
             [moogus-queue]))
 
