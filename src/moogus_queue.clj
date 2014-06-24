@@ -33,7 +33,7 @@
 
 (defn start-queue! [system]
   (immutant.messaging/start queue-name)
-  (immutant.messaging/listen queue-name (partial worker system)))
+  (immutant.messaging/listen queue-name (partial worker (:config system))))
 
 (defn start-system! [_]
   (let [system {:config (load-system-config)}
