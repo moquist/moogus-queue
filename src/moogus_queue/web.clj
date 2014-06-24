@@ -17,7 +17,7 @@
   (let [queue-name (:queue-name system)
         body (slurp (get-in ctx [:request :body]))
         body (json/read-str body :key-fn keyword)]
-    (when (assert-queue-entry @(:db-conn system) queue-name body)
+    (when (assert-queue-entry (:db-conn system) body)
       (immutant.messaging/publish queue-name body))))
 
 (defresource qresource [system _request]
