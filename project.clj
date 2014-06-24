@@ -4,12 +4,13 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/data.json "0.2.4"]
+                 [org.clojure/data.json "0.2.5"]
                  [clj-http "0.9.2"]
                  [liberator "0.11.0"]
                  [org.immutant/immutant "1.1.2"
                   :exclusions [org.hornetq/hornetq-core-client io.netty/netty]]
-                 [datomic-schematode "0.1.0-RC3"]
+                 [datomic-schematode "0.1.2-RC1"]
+                 [org.clojure/test.check "0.5.8"]
                  #_
                  [ring "1.3.0" :exclusions [hiccup]]
                  [compojure "1.1.8"]]
