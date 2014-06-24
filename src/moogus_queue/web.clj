@@ -8,7 +8,7 @@
             [immutant.messaging]
             [datomic.api :as d]))
 
-(defn assert-queue-entry [db-conn queue-name message]
+(defn assert-queue-entry [db-conn message]
   (d/transact db-conn [{:db/id (d/tempid :db.part/user)
                         :queue-entry/message (str message)
                         :queue-entry/attempted-count 0}]))
