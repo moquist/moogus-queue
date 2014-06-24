@@ -51,7 +51,7 @@
 
 (defn stop-system! [system]
   (immutant.web/stop)
-  (immutant.messaging/stop queue-name))
+  (immutant.messaging/stop queue-name :force true))
 
 (defn init []
   (alter-var-root #'system start-system!))
