@@ -19,18 +19,20 @@
 
 (use-fixtures :once testing-fixture)
 
+(defn properties [system]
+  (let [db-conn (:db-conn system)]
+    {:assert-queue-entry (prop/for-all
+                          [msg gen/string]
+                          (let [t (moogus-queue.web/assert-queue-entry db-conn msg)]
+                            (is (mqt/ensure-tx t))
+                            (is (integer? (ffirst
+                                           (d/q '[:find ?e
+                                                  :in $ ?data
+                                                  :where [?e :queue-entry/message ?data]]
+                                                (d/db db-conn)
+                                                msg))))))}))
+
 (deftest web-assert-queue-entry-test
-  (let [db-conn (:db-conn moogus-queue/system)
-        prop (prop/for-all
-              [msg gen/string]
-              (let [t (moogus-queue.web/assert-queue-entry db-conn msg)]
-                (testing "assert-queue-entry"
-                  (is (mqt/ensure-tx t))
-                  (is (integer? (ffirst
-                                 (d/q '[:find ?e
-                                        :in $ ?data
-                                        :where [?e :queue-entry/message ?data]]
-                                      (d/db db-conn)
-                                      msg)))))))
-        t (tc/quick-check num-quick-checks prop)]
-    (is (:result t) (str t))))
+  (doseq [[n prop] (properties moogus-queue/system)]
+    (let [t (tc/quick-check num-quick-checks prop)]
+      (is (:result t) (str n ": " t)))))
