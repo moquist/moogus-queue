@@ -13,7 +13,7 @@
 
 (use-fixtures :once mqt/testing-fixture)
 
-(tct/defspec web-assert-queue-entry-test2
+(tct/defspec assert-queue-entry-test
   mqt/num-quick-checks
   (prop/for-all
    [msg gen/string]
