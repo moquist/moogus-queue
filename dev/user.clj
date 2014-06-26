@@ -8,6 +8,7 @@
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
+            [clojure.test.check.clojure-test :as tct]
             [datomic.api :as d]
             [datomic-schematode :as dst]
             [immutant.dev]
