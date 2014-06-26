@@ -1,4 +1,12 @@
-(ns moogus-queue.testlib)
+(ns moogus-queue.testlib
+  (:require [moogus-queue]))
+
+(def num-quick-checks 1000)
+
+(defn testing-fixture [f]
+  (swap! moogus-queue/system moogus-queue/start-system!)
+  (f)
+  (swap! moogus-queue/system moogus-queue/stop-system!))
 
 (defmacro should-throw
   "Borrowed from https://github.com/Datomic/day-of-datomic .

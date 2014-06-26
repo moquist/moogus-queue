@@ -10,7 +10,7 @@
   (:import (java.io File)))
 
 (def queue-name "queue.moogus")
-(def system nil)
+(def system (atom nil))
 
 (defn file-exists? [path]
   (if (.isFile (File. path)) true false))
@@ -51,7 +51,8 @@
 
 (defn stop-system! [system]
   (immutant.web/stop)
-  (immutant.messaging/stop queue-name :force true))
+  (immutant.messaging/stop queue-name :force true)
+  nil)
 
 (defn init []
-  (alter-var-root #'system start-system!))
+  (swap! system start-system!))

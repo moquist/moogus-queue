@@ -8,16 +8,17 @@
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
+            [clojure.test.check.clojure-test :as tct]
             [datomic.api :as d]
             [datomic-schematode :as dst]
             [immutant.dev]
             [moogus-queue]))
 
 (defn stop! []
-  (alter-var-root #'moogus-queue/system moogus-queue/stop-system!))
+  (swap! moogus-queue/system moogus-queue/stop-system!))
 
 (defn start! []
-  (alter-var-root #'moogus-queue/system moogus-queue/start-system!))
+  (swap! moogus-queue/system moogus-queue/start-system!))
 
 (defn reset
   "If you are accustomed to tools.namespace and reset, you can use this.
@@ -30,7 +31,7 @@
 (defn reset-and-delete-db! [delete-db]
   (when (= :delete-db delete-db)
     (stop!)
-    (d/delete-database (get-in moogus-queue/system [:config :datomic-url]))
+    (d/delete-database (get-in @moogus-queue/system [:config :datomic-url]))
     (immutant.dev/reload-project!)
     (start!)))
 
@@ -43,9 +44,9 @@
   [query & data-sources]
   (map #(d/touch
          (d/entity
-          (d/db (:db-conn moogus-queue/system))
+          (d/db (:db-conn @moogus-queue/system))
           (first %)))
-       (apply d/q query (d/db (:db-conn moogus-queue/system)) data-sources)))
+       (apply d/q query (d/db (:db-conn @moogus-queue/system)) data-sources)))
 
 (defn ptouch-that
   "Example: (ptouch-that '[:find ?e :where [?e :user/username]])"
