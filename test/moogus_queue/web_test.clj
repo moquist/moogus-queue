@@ -11,17 +11,10 @@
             [moogus-queue.web]
             [moogus-queue.testlib :as mqt]))
 
-(def num-quick-checks 1000)
-
-(defn testing-fixture [f]
-  (swap! moogus-queue/system moogus-queue/start-system!)
-  (f)
-  (swap! moogus-queue/system moogus-queue/stop-system!))
-
-(use-fixtures :once testing-fixture)
+(use-fixtures :once mqt/testing-fixture)
 
 (tct/defspec web-assert-queue-entry-test2
-  num-quick-checks
+  mqt/num-quick-checks
   (prop/for-all
    [msg gen/string]
    (let [db-conn (:db-conn @moogus-queue/system)
