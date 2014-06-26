@@ -13,9 +13,9 @@
 (def num-quick-checks 1000)
 
 (defn testing-fixture [f]
-  (alter-var-root #'moogus-queue/system moogus-queue/start-system!)
+  (swap! moogus-queue/system moogus-queue/start-system!)
   (f)
-  (alter-var-root #'moogus-queue/system moogus-queue/stop-system!))
+  (swap! moogus-queue/system moogus-queue/stop-system!))
 
 (use-fixtures :once testing-fixture)
 
@@ -24,15 +24,16 @@
     {:assert-queue-entry (prop/for-all
                           [msg gen/string]
                           (let [t (moogus-queue.web/assert-queue-entry db-conn msg)]
-                            (is (mqt/ensure-tx t))
-                            (is (integer? (ffirst
-                                           (d/q '[:find ?e
-                                                  :in $ ?data
-                                                  :where [?e :queue-entry/message ?data]]
-                                                (d/db db-conn)
-                                                msg))))))}))
+                            (testing "magic"
+                              (is (mqt/ensure-tx t))
+                              (is (integer? (ffirst
+                                             (d/q '[:find ?e
+                                                    :in $ ?data
+                                                    :where [?e :queue-entry/message ?data]]
+                                                  (d/db db-conn)
+                                                  msg)))))))}))
 
 (deftest web-assert-queue-entry-test
-  (doseq [[n prop] (properties moogus-queue/system)]
+  (doseq [[nom prop] (properties @moogus-queue/system)]
     (let [t (tc/quick-check num-quick-checks prop)]
-      (is (:result t) (str n ": " t)))))
+      (is (:result t) (str nom ": " t)))))
