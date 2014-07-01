@@ -23,8 +23,7 @@
 (defresource qresource [system _request]
   :allowed-methods [:put]
   :available-media-types ["application/json"]
-  :put! (partial enqueue system)
-  :handle-created (fn [ctx] (str ctx)))
+  :put! (partial enqueue system))
 
 (defn app [system]
   (-> (routes (PUT "/" [] (partial qresource system)))
