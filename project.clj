@@ -11,9 +11,7 @@
                   :exclusions [org.hornetq/hornetq-core-client io.netty/netty]]
                  [datomic-schematode "0.1.2-RC1"]
                  [org.clojure/test.check "0.5.8"]
-                 #_
-                 [ring "1.3.0" :exclusions [hiccup]]
-                 [compojure "1.1.8"]]
+                 [compojure "1.1.8" :exclusions [ring/ring-core]]]
 
   :pedantic? :warn ; :abort
 
@@ -23,6 +21,7 @@
 
   
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.4"]
+                                  [ring "1.3.0" :exclusions [hiccup]]
                                   [com.datomic/datomic-free "0.9.4766"
                                    :exclusions [org.jboss.logging/jboss-logging org.jgroups/jgroups]]]
                    :source-paths ["dev"]}
