@@ -9,10 +9,12 @@
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :as tct]
+            [ring.adapter.jetty :refer [run-jetty]] 
             [datomic.api :as d]
             [datomic-schematode :as dst]
             [immutant.dev]
-            [moogus-queue]))
+            [moogus-queue]
+            [moogus-queue.testlib]))
 
 (defn stop! []
   (swap! moogus-queue/system moogus-queue/stop-system!))
