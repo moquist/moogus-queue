@@ -17,7 +17,7 @@
 (use-fixtures :once mqt/testing-fixture)
 
 (tct/defspec assert-queue-entry-test
-  mqt/num-quick-checks
+  1000
   (prop/for-all
    [msg gen/string]
    (let [db-conn (:db-conn @moogus-queue/system)
