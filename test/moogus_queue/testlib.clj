@@ -1,12 +1,27 @@
 (ns moogus-queue.testlib
-  (:require [moogus-queue]))
+  (:require [compojure.core :refer [POST]]
+            [ring.adapter.jetty :refer [run-jetty]] 
+            [moogus-queue]))
 
 (def num-quick-checks 1000)
 
+(def genius-well (atom []))
+
+(defn -testing-api [_]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "Powered by Message"})
+
+(def testing-api
+  (POST "/:function" [f] (fn testing-api- [req] (swap! genius-well conj req) "hi there!")))
+
 (defn testing-fixture [f]
-  (swap! moogus-queue/system moogus-queue/start-system!)
-  (f)
-  (swap! moogus-queue/system moogus-queue/stop-system!))
+  (let [j (run-jetty testing-api {:port 8081 :join? false})]
+    (swap! genius-well (constantly []))
+    (swap! moogus-queue/system moogus-queue/start-system!)
+    (f)
+    (swap! moogus-queue/system moogus-queue/stop-system!)
+    (.stop j)))
 
 (defmacro should-throw
   "Borrowed from https://github.com/Datomic/day-of-datomic .
