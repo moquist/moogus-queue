@@ -30,10 +30,19 @@
                           (d/db db-conn)
                           msg)))))))
 
-(deftest call-myself
-  (let [url (immutant.util/app-uri)
-        r (clj-http.client/put
-           url
-           {:body (json/write-str {:function "wunction" :meeple "value"})})]
-    (is (= 201 (:status r)) (str r))))
+(tct/defspec call-myself
+  1000
+  (prop/for-all
+   [f (gen/such-that not-empty gen/string-ascii)
+    m (gen/such-that
+       not-empty
+       (gen/map gen/keyword
+                (gen/fmap
+                 ring.util.codec/url-encode
+                 (gen/such-that not-empty gen/string-ascii))))]
+   (let [url (immutant.util/app-uri)
+         r (clj-http.client/put
+            url
+            {:body (json/write-str (assoc m :function f))})]
+     (= 201 (:status r)) (str r))))
 
