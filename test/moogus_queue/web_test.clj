@@ -31,7 +31,9 @@
                           msg)))))))
 
 (deftest call-myself
-  (is (map?
-       (let [url (immutant.util/app-uri)]
-         (clj-http.client/put url {:body (json/write-str {:function "wunction" :meeple "value"})})))))
+  (let [url (immutant.util/app-uri)
+        r (clj-http.client/put
+           url
+           {:body (json/write-str {:function "wunction" :meeple "value"})})]
+    (is (= 201 (:status r)) (str r))))
 
