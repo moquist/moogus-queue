@@ -4,8 +4,6 @@
             [ring.middleware.params :refer [wrap-params]]
             [moogus-queue]))
 
-(def num-quick-checks 1000)
-
 (def genius-well (atom nil))
 
 (defn -testing-api [_]
