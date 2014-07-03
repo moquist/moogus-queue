@@ -21,8 +21,6 @@
         body (json/read-str body :key-fn keyword)
         entid (assert-queue-entry (:db-conn system) body)]
     (immutant.messaging/publish queue-name
-                                #_
-                                body
                                 {:entid entid :message body})))
 
 (defresource qresource [system _request]
