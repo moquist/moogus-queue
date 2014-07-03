@@ -23,7 +23,7 @@
   (let [url (str uri "/" f)]
     (clj-http.client/post url {:form-params params})))
 
-(defn worker [{:keys [genius-api-url genius-api-token-outgoing]} message]
+(defn worker [{:keys [genius-api-url genius-api-token-outgoing]} {:keys [entid message]}]
   (let [f (:function message)
         params (dissoc message :function)
         params (assoc message :token genius-api-token-outgoing)]
