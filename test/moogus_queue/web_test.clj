@@ -21,14 +21,14 @@
   (prop/for-all
    [msg gen/string]
    (let [db-conn (:db-conn @moogus-queue/system)
-         t (moogus-queue.web/assert-queue-entry db-conn msg)]
-     (and (mqt/ensure-tx t)
-          (integer? (ffirst
-                     (d/q '[:find ?e
-                            :in $ ?data
-                            :where [?e :queue-entry/message ?data]]
-                          (d/db db-conn)
-                          msg)))))))
+         entid (moogus-queue.web/assert-queue-entry db-conn msg)]
+     (= msg
+        (ffirst
+         (d/q '[:find ?data
+                :in $ ?e
+                :where [?e :queue-entry/message ?data]]
+              (d/db db-conn)
+              entid))))))
 
 (defn check-expected
   "Returns true if our fake \"genius\" receive the call and data we sent." 
