@@ -1,11 +1,12 @@
 (ns moogus-queue.testlib
   (:require [compojure.core :refer [POST]]
             [ring.adapter.jetty :refer [run-jetty]] 
+            [ring.middleware.params :refer [wrap-params]]
             [moogus-queue]))
 
 (def num-quick-checks 1000)
 
-(def genius-well (atom []))
+(def genius-well (atom nil))
 
 (defn -testing-api [_]
   {:status  200
@@ -13,14 +14,17 @@
    :body    "Powered by Message"})
 
 (def testing-api
-  (POST "/:function" [f] (fn testing-api- [req] (swap! genius-well conj req) "hi there!")))
+  (wrap-params
+   (POST "/:function" [function]
+         (fn testing-api- [req]
+           (spit "/tmp/well.edn" req :append true)
+           (swap! genius-well conj {:function function :query-params (:query-params req)})
+           "replace me with fake Genius XML"))))
 
 (defn testing-fixture [f]
-  (let [j (run-jetty testing-api {:port 8081 :join? false})]
-    (swap! genius-well (constantly []))
-    (swap! moogus-queue/system moogus-queue/start-system!)
+  (let [j (run-jetty testing-api {:port 8083 :join? false})]
+    (swap! genius-well (constantly #{}))
     (f)
-    (swap! moogus-queue/system moogus-queue/stop-system!)
     (.stop j)))
 
 (defmacro should-throw

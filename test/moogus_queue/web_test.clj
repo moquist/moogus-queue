@@ -30,19 +30,25 @@
                           (d/db db-conn)
                           msg)))))))
 
+(defn getthing [expected]
+  ;; So far, this always seems to happen fast enough so no looping Thread/sleep is necessary.
+  (= expected @moogus-queue.testlib/genius-well))
+
 (tct/defspec call-myself
   1000
   (prop/for-all
-   [f (gen/such-that not-empty gen/string-ascii)
-    m (gen/such-that
-       not-empty
-       (gen/map gen/keyword
-                (gen/fmap
-                 ring.util.codec/url-encode
-                 (gen/such-that not-empty gen/string-ascii))))]
-   (let [url (immutant.util/app-uri)
+   [f (gen/fmap ring.util.codec/url-encode
+                (gen/such-that not-empty gen/string-ascii))
+    m (gen/such-that not-empty
+                     (gen/map gen/keyword
+                              (gen/fmap ring.util.codec/url-encode
+                                        (gen/such-that not-empty gen/string-ascii))))]
+   (let [expected {:function f :query-params m}
+         url (immutant.util/app-uri)
          r (clj-http.client/put
             url
             {:body (json/write-str (assoc m :function f))})]
-     (= 201 (:status r)) (str r))))
+     (and (= 201 (:status r))
+          (getthing expected)) (str r))))
+
 
