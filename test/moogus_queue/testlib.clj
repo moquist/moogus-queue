@@ -2,6 +2,7 @@
   (:require [compojure.core :refer [POST]]
             [ring.adapter.jetty :refer [run-jetty]] 
             [ring.middleware.params :refer [wrap-params]]
+            [clj-http.client]
             [moogus-queue]))
 
 (def genius-well (atom nil))
@@ -19,7 +20,8 @@
            "replace me with fake Genius XML"))))
 
 (defn testing-fixture [f]
-  (let [j (run-jetty testing-api {:port 8083 :join? false})]
+  (let [port (-> @moogus-queue/system :config :genius-api-url clj-http.client/parse-url :server-port)
+        j (run-jetty testing-api {:port port :join? false})]
     (swap! genius-well (constantly #{}))
     (f)
     (.stop j)))
