@@ -30,8 +30,9 @@
                           (d/db db-conn)
                           msg)))))))
 
-(defn getthing [expected]
-  ;; So far, this always seems to happen fast enough so no looping Thread/sleep is necessary.
+(defn check-expected
+  "Returns true if our fake \"genius\" receive the call and data we sent." 
+  [expected]
   (= expected @moogus-queue.testlib/genius-well))
 
 (tct/defspec call-myself
@@ -49,6 +50,6 @@
             url
             {:body (json/write-str (assoc m :function f))})]
      (and (= 201 (:status r))
-          (getthing expected)) (str r))))
+          (check-expected expected)) (str r))))
 
 

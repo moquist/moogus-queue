@@ -15,7 +15,6 @@
   (wrap-params
    (POST "/:function" [function]
          (fn testing-api- [req]
-           (spit "/tmp/well.edn" req :append true)
            (swap! genius-well conj {:function function :query-params (:query-params req)})
            "replace me with fake Genius XML"))))
 
