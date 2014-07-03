@@ -16,10 +16,8 @@
   (if (.isFile (File. path)) true false))
 
 (defn load-system-config []
-  (let [path "moogus-queue-conf.edn"]
-    (if (file-exists? path)
-      (clojure.edn/read-string (slurp path))
-      (throw (Exception. (str "Config file missing: " path))))))
+  (let [file (immutant.util/app-relative "moogus-queue-conf.edn")]
+    (clojure.edn/read-string (slurp file))))
 
 (defn call! [uri f params]
   (let [url (str uri "/" f)]
@@ -35,8 +33,10 @@
   (immutant.messaging/start queue-name)
   (immutant.messaging/listen queue-name (partial worker (:config system))))
 
-(defn start-system! [_]
-  (let [system {:config (load-system-config)}
+(defn start-system! [system]
+  (let [system (if (nil? system)
+                 {:config (load-system-config)}
+                 system)
         db-url (-> system :config :db-url)
         system (assoc system :queue-name queue-name)
         system (assoc system :new-db (d/create-database db-url))
