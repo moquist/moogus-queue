@@ -35,6 +35,9 @@
   [expected]
   (= expected @moogus-queue.testlib/genius-well))
 
+(defn token->header [token]
+  (str "Token " token))
+
 (tct/defspec call-myself
   1000
   (prop/for-all
@@ -46,9 +49,13 @@
                                         (gen/such-that not-empty gen/string-ascii))))]
    (let [expected {:function f :query-params m}
          url (immutant.util/app-uri)
+         token (token->header (-> @moogus-queue/system
+                                  :config
+                                  :api-token-incoming))
          r (clj-http.client/put
             url
-            {:body (json/write-str (assoc m :function f))})]
+            {:body (json/write-str (assoc m :function f))
+             :headers {:authorization token}})]
      (and (= 201 (:status r))
           (check-expected expected)) (str r))))
 
