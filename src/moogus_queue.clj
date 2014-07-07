@@ -23,15 +23,24 @@
   (let [url (str uri "/" f)]
     (clj-http.client/post url {:form-params params})))
 
-(defn worker [{:keys [genius-api-url genius-api-token-outgoing]} {:keys [entid message]}]
+(defn assert-genius-response [db-conn entid response]
+  (let [http-status (:status response)
+        e (d/entity (d/db db-conn) entid)
+        cnt (-> e :queue-entry/attempted-count inc)]
+    (d/transact db-conn [{:db/id entid
+                          :queue-entry/genius-response-full (str response)
+                          :queue-entry/attempted-count cnt}])))
+
+(defn worker [{:keys [genius-api-url genius-api-token-outgoing]} db-conn {:keys [entid message]}]
   (let [f (:function message)
         params (dissoc message :function)
-        params (assoc message :token genius-api-token-outgoing)]
-    (spit "/tmp/blarpfiddle.edn" (call! genius-api-url f params))))
+        params (assoc message :token genius-api-token-outgoing)
+        response (call! genius-api-url f params)]
+    (assert-genius-response db-conn entid response)))
 
 (defn start-queue! [system]
   (immutant.messaging/start queue-name)
-  (immutant.messaging/listen queue-name (partial worker (:config system))))
+  (immutant.messaging/listen queue-name (partial worker (:config system) (:db-conn system))))
 
 (defn start-system! [system]
   (let [system (if (nil? system)

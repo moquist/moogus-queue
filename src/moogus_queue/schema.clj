@@ -4,4 +4,6 @@
   [{:namespace :queue-entry
     :attrs [[:message :string]
             [:attempted-count :long]
-            [:issuccessful :boolean]]}])
+            [:http-status :long :many]
+            [:genius-response-full :string :many]
+            [:genius-response-msg :string :many]]}])
