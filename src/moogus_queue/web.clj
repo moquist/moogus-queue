@@ -6,7 +6,8 @@
             [compojure.core :refer [routes PUT]]
             [clojure.data.json :as json]
             [immutant.messaging]
-            [datomic.api :as d]))
+            [datomic.api :as d]
+            [moogus-queue.auth :as auth]))
 
 (defn assert-queue-entry [db-conn message]
   (let [tx (d/transact db-conn [{:db/id (d/tempid :db.part/user -1)
@@ -26,7 +27,9 @@
 (defresource qresource [system _request]
   :allowed-methods [:put]
   :available-media-types ["application/json"]
-  :put! (partial enqueue system))
+  :put! (partial enqueue system)
+  :authorized? (partial auth/validate-token (:config system))
+  :handle-unauthorized "You are not authorized to access this resource.")
 
 (defn app [system]
   (-> (routes (PUT "/" [] (partial qresource system)))

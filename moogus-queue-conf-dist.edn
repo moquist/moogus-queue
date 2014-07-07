@@ -1,3 +1,4 @@
 {:db-url "datomic:mem://moogus-queue-test"
  :genius-api-url "http://localhost:8081/"
- :genius-api-token-outgoing "keep it secret, keep it safe"}
+ :genius-api-token-outgoing "keep it secret, keep it safe"
+ :api-token-incoming "efas ti peek, terces ti peek"}
