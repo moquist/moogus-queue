@@ -19,16 +19,18 @@
 (defn stop! []
   (swap! moogus-queue/system moogus-queue/stop-system!))
 
-(defn start! []
-  (swap! moogus-queue/system moogus-queue/start-system!))
+(defn start! [& config-path]
+  (let [path (or config-path "moogus-queue-conf.edn")]
+    (swap! moogus-queue/system (partial moogus-queue/start-system! path))))
 
 (defn reset
   "If you are accustomed to tools.namespace and reset, you can use this.
    It makes you feel better."
-  []
-  (stop!)
-  (immutant.dev/reload-project!)
-  (start!))
+  ([] (reset "moogus-queue-conf.edn"))
+  ([config-path]
+     (stop!)
+     (immutant.dev/reload-project!)
+     (start! config-path)))
 
 (defn reset-and-delete-db! [delete-db]
   (when (= :delete-db delete-db)
