@@ -34,9 +34,8 @@
   designed to be used in the authorized? section
   of a liberator resource.
 
-  Params:  ctx - Liberator Context
-  db-conn  - Datomic database connection
+  expected-token - the expected token (from moogus-queue/system)
+  ctx - Liberator Context
   Returns: boolean"
-  [config ctx]
-  (let [token  (request->auth-token ctx)]
-    (= token (:api-token-incoming config))))
+  [expected-token ctx]
+  (= (request->auth-token ctx) expected-token))

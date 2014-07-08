@@ -28,7 +28,7 @@
   :allowed-methods [:put]
   :available-media-types ["application/json"]
   :put! (partial enqueue system)
-  :authorized? (partial auth/validate-token (:config system))
+  :authorized? (partial auth/validate-token (-> system :config :api-token-incoming))
   :handle-unauthorized "You are not authorized to access this resource.")
 
 (defn app [system]
