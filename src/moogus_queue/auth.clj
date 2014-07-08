@@ -14,7 +14,7 @@
       (str "")
       (let [split-auth (string/split auth #"\s+")]
         (if (= (str "Token") (first split-auth))
-          (second split-auth)
+          (string/join " " (rest split-auth))
           (str ""))))))
 
 (defn gen-token
