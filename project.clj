@@ -16,6 +16,7 @@
   :pedantic? :warn ; :abort
 
   :immutant {:init moogus-queue/init
+             :config-path "moogus-queue-conf.edn"
              :resolve-dependencies true
              :context-path "/"}
 
@@ -25,6 +26,7 @@
                                   [com.datomic/datomic-free "0.9.4766"
                                    :exclusions [org.jboss.logging/jboss-logging org.jgroups/jgroups]]]
                    :source-paths ["dev"]}
+             :ci-test {:immutant {:config-path "moogus-queue-conf-dist.edn"}}
              :production {:repositories [["my.datomic.com" {:url "https://my.datomic.com/repo"
                                                             :username :env/lein_datomic_repo_username
                                                             :password :env/lein_datomic_repo_password}]]

@@ -2,6 +2,7 @@
   (:require
    [immutant.web]
    [immutant.messaging]
+   [immutant.registry]
    [clj-http.client]
    [datomic-schematode :as dst]
    [datomic.api :as d]
@@ -15,8 +16,8 @@
 (defn file-exists? [path]
   (if (.isFile (File. path)) true false))
 
-(defn load-system-config []
-  (let [file (immutant.util/app-relative "moogus-queue-conf.edn")]
+(defn load-system-config [path]
+  (let [file (immutant.util/app-relative path)]
     (clojure.edn/read-string (slurp file))))
 
 (defn call! [uri f params]
@@ -42,10 +43,8 @@
   (immutant.messaging/start queue-name)
   (immutant.messaging/listen queue-name (partial worker (:config system) (:db-conn system))))
 
-(defn start-system! [system]
-  (let [system (if (nil? system)
-                 {:config (load-system-config)}
-                 system)
+(defn start-system! [path _]
+  (let [system {:config (load-system-config path)}
         db-url (-> system :config :db-url)
         system (assoc system :queue-name queue-name)
         system (assoc system :new-db (d/create-database db-url))
@@ -64,4 +63,5 @@
   nil)
 
 (defn init []
-  (swap! system start-system!))
+  (let [path (:config-path (immutant.registry/get :config))]
+    (swap! system (partial start-system! path))))
